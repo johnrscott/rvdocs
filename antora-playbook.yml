@@ -1,23 +1,22 @@
 site:
-  title: Antora Docs Test
-  start_page: component-b::index.adoc 
+  title: RISC-V Designs
+  start_page: single-cycle::index.adoc
 content:
   sources: 
-  - url: https://gitlab.com/antora/demo/demo-component-a.git
+  - url: https://github.com/johnrscott/rv0.git
     branches: HEAD
-  - url: https://gitlab.com/antora/demo/demo-component-b.git
-    branches: [v2.0, v1.0]
     start_path: docs
-ui: 
+ui:
   bundle:
     url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
     snapshot: true
   # You need this section if you are using GitHub actions to generate
   # the site, to prevent jekyll from ignoring files starting with _
   # (see https://docs.antora.org/antora/latest/publish-to-github-pages/)
-  supplemental_files:
-  - path: ui.yml
-    contents: |
-      static_files:
-      - .nojekyll
-  - path: .nojekyll
+  # supplemental_files:
+  # - path: ui.yml
+  #   contents: |
+  #     static_files:
+  #     - .nojekyll
+  # - path: .nojekyll
+  supplemental_files: ./supplemental-ui
