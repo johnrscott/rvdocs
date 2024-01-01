@@ -50,3 +50,8 @@ jobs:
         FOLDER: "${{ env.SITE_DIR }}"
         BRANCH: 'gh-pages'
         COMMIT_MESSAGE: "[CI] Publish Documentation for ${{ github.sha }}"
+        # This is required to ensure that files from the old version of
+        # the documentation are not retained when updated docs are generated
+        # (you need this even if you have the clean key set in
+        # antora-playbook.yml)
+        clean: true
