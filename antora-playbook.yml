@@ -20,3 +20,8 @@ ui:
   #     - .nojekyll
   # - path: .nojekyll
   supplemental_files: ./supplemental-ui
+
+output:
+  # Go careful not to set dir: to something
+  # that you don't want clean below to delete!
+  clean: true
