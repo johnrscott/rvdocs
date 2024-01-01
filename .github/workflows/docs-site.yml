@@ -35,17 +35,6 @@ jobs:
       uses: actions/upload-pages-artifact@v2
       with:
         path: build/site
-
-    # This seems to be the only way to clean the gh-pages
-    # branch. The action below does not have a clean option,
-    # and you can end up with files left over from previous
-    # deployments (e.g. the .nojekyll file; this makes testing
-    # the configuration unreliable)
-    - name: Delete github pages branch
-      uses: dawidd6/action-delete-branch@v3
-      with:
-        github_token: ${{github.token}}
-        branches: gh-pages
         
     - name: Deploy to GitHub Pages
       id: deployment
