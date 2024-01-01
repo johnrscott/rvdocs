@@ -2,6 +2,7 @@ site:
   title: RISC-V Designs
   start_page: single-cycle::index.adoc
 content:
+  edit_url: false
   sources: 
   - url: https://github.com/johnrscott/rv0.git
     branches: HEAD
