@@ -35,7 +35,10 @@ jobs:
       uses: actions/upload-pages-artifact@v2
       with:
         path: build/site
-        
+
+    # Currently there is a bug in this due to the
+    # branch not being cleaned. This can leave
+    # old docs content in the branch.
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v2
