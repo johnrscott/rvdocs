@@ -31,10 +31,17 @@ jobs:
       run: npm i antora
     - name: Generate Site
       run: npx antora antora-playbook.yml
-    - name: Upload Artifacts
-      uses: actions/upload-pages-artifact@v2
-      with:
-        path: build/site
     - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v2
+      uses: JamesIves/github-pages-deploy-action@3.2.1
+      with:
+        # ACCESS_TOKEN: # optional
+        GITHUB_TOKEN: "${{ github.token}}"
+        FOLDER: build/site/
+        BRANCH: 'gh-pages'
+        COMMIT_MESSAGE: "[CI] Publish Documentation for ${{ github.sha }}"
+        # This is required to ensure that files from the old version of
+        # the documentation are not retained when updated docs are generated
+        # (you need this even if you have the clean key set in
+        # antora-playbook.yml)
+        clean: true
+      
