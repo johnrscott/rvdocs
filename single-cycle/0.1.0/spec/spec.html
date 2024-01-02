@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Specification :: RISC-V Designs</title>
+    <meta name="generator" content="Antora 3.1.6">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../..">RISC-V Designs</a>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <!--
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+      -->
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="single-cycle" data-version="0.1.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../index.html">Single Cycle CPU</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Overview</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="spec.html">Specification</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../design/design.html">Design</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../notes/notes.html">Notes</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Single Cycle CPU</span>
+    <span class="version">0.1.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">Single Cycle CPU</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">0.1.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Single Cycle CPU</a></li>
+    <li><a href="spec.html">Specification</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Specification</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This part summarises the specification for the design, including the instructions that needs supporting, the CSR registers, and the interrupts/exceptions. Throughout the specification, the RISC-V specification is referenced in the following format:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>v1_c9</code> means RISC-V volume 1 (unprivileged ISA), chapter 9</p>
+</li>
+<li>
+<p><code>v1_t9.1</code> means RISC-V volume 1 (unprivileged ISA), table 9.1</p>
+</li>
+<li>
+<p><code>v2_s2.3</code> means RISC-V volume 2 (privileged architecture), section 2.3</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>All references to volume 1 refer to version 20191213 (document <code>riscv-spec-20191213.pdf</code>), and references to volume 2 refer to version 20211203 (document <code>riscv-privileged-20211203.pdf</code>). Both documents are available from the <a href="https://riscv.org/technical/specifications/">official specification page</a>.</p>
+</div>
+<div class="paragraph">
+<p>Other non-ISA specifications are also used. References to the Platform-Level Interrupt Controller (PLIC) Specification refer to version 1.0.0, 3/2023 (document <code>riscv-plic-1.0.0.pdf</code>, available <a href="https://wiki.riscv.org/display/HOME/RISC-V+Technical+Specifications">here</a>). References use a format like:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>plic_f1</code> means RISC-V PLIC specification, figure 1</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cpu_state"><a class="anchor" href="#_cpu_state"></a>CPU State</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The registers required by the RISC-V implementation are summarised in this section. The register file contains 32 registers which are each 32 bits wide, called <code>x0</code>-<code>x31</code>. The first register <code>x0</code> is writable, but always returns zero when read. The program counter is 32 bits wide, and is initialised to the reset vector.</p>
+</div>
+<div class="sect2">
+<h3 id="_control_and_status_registers"><a class="anchor" href="#_control_and_status_registers"></a>Control and Status Registers</h3>
+<div class="paragraph">
+<p>A certain minimal set of control and status registers (CSRs) are required by the RISC-V privileged specification. Each is listed in the format "`CSR-address CSR-name`: description" below.</p>
+</div>
+<div class="paragraph">
+<p>The following informational registers are required to be present, but can be read-only zero:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>0xf11 mvendorid</code>: read-only; returns 0 to indicate not implemented.</p>
+</li>
+<li>
+<p><code>0xf12 marchid</code>: read-only; returns 0 to indicate not implemented.</p>
+</li>
+<li>
+<p><code>0xf13 mimpid</code>: read-only; returns 0 to indicate not implemented.</p>
+</li>
+<li>
+<p><code>0xf14 mhartid</code>: read-only; single hart system, returns 0 to indicate hart 0.</p>
+</li>
+<li>
+<p><code>0xf15 mconfigptr</code>: read-only zero, configuration platform-specification defined</p>
+</li>
+<li>
+<p><code>0x301 misa</code>: read/write; single legal value 0 always returned (WARL), meaning architecture is determined by non-standard means (it is rv32im_zicsr implementing M-mode only).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The status of the CPU is stored in the following status registers:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>0x300 mstatus</code>: read/write, containing both WPRI and WARL fields. The bit fields which are non-zero are as follows (assumes only M-mode):</p>
+<div class="ulist">
+<ul>
+<li>
+<p>bit 3: MIE (interrupt enable), read/write</p>
+</li>
+<li>
+<p>bit 7: MPIE (previous value of interrupt enable), read/write (?)</p>
+</li>
+<li>
+<p>bits [12:11]: MPP (previous privilege mode), WARL always 0b11 (?)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>0x310 mstatush</code>: read/write, upper 32-bit of status; all fields are read-only zero (only little-endian memory is supported).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In addition to the global bit in the status register, interrupts are controlled and monitored by these registers:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>0x304 mie</code>: read/write interrupt-enable register. To enable an interrupt in M-mode, both mstatus.MIE and the bit in mie must be set. Bits corresponding to interrupts that cannot occur must be read-only zero.</p>
+</li>
+<li>
+<p><code>0x344 mip</code>: 32-bit read/write interrupt-pending register. Since all fields are read-only, writes to this CSR are no-op. The following bits are defined:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>bit 3: machine software interrupt pending (read-only)</p>
+</li>
+<li>
+<p>bit 7: machine timer interrupt pending (read-only)</p>
+</li>
+<li>
+<p>bit 11: machine-level external interrupt pending (read-only)</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When a trap occurs (either due to an interrupt or a exception), the following registers determine where control flow is transferred to and where it returns to after the trap:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>0x305 mtvec</code>: read-only, trap handler vector table base address</p>
+<div class="ulist">
+<ul>
+<li>
+<p>bits [1:0]: 1 (vectored mode)</p>
+</li>
+<li>
+<p>bits [31:2]: trap vector table base address (4-byte aligned)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>0x341 mepc</code>: 32-bit, read/write register, stores the return-address from trap handler. WARL, valid values are allowed physical addresses (4-byte aligned and fit within physical memory address width).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Information about the trap is obtained from these registers:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>0x342 mcause</code>: 32-bit, read/write, stores exception code and bit indicating whether trap is interrupt. Exception code is WLRL.</p>
+</li>
+<li>
+<p><code>0x343 mtval</code>: read-only zero</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In addition, software may use this register in any way while processing traps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>0x340 mscratch</code>: 32-bit read/write register for use by trap handlers</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The following privileged-mode registers hold performance monitoring information:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>0xb00 mcycle</code>: low 32 bits of read/write 64-bit register incrementing at a constant rate</p>
+</li>
+<li>
+<p><code>0xb80 mcycleh</code>: high 32 bits of read/write, 64-bit register containing number of clock cycles executed by the processor.</p>
+</li>
+<li>
+<p><code>0xb02 minstret</code>: low 32 bits of read/write, 64-bit register containing number of instructions retired by the processor.</p>
+</li>
+<li>
+<p><code>0xb82 minstreth</code>: high 64 bits of read/write, 64-bit register containing number of instructions retired by the processor.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>These registers are also accessible via the following shadows (intended for use by unprivileged mode; however, there is only M-mode here, so there is no distinction between privilege levels):</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>0bc00 cycle</code>: read-only shadow of mcycle</p>
+</li>
+<li>
+<p><code>0xc80 cycleh</code>: read-only shadow of mcycleh</p>
+</li>
+<li>
+<p><code>0xc02 instret</code>: read-only shadow of minstret</p>
+</li>
+<li>
+<p><code>0xc82 instreth</code>: read-only shadow of minstreth</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The 64-bit <code>mtime</code> register is memory-mapped (it is not a CSR); however, it does have a read-only shadow as a CSR:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>0xc01 time</code>: read-only shadow of lower 32 bits of memory mapped 64-bit mtime</p>
+</li>
+<li>
+<p><code>0xc81 timeh</code>: read-only shadow of upper 32 bits of memory mapped 64-bit mtime</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Finally, the following required performance monitoring counters are all implemented as read-only zero</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>(0xb00 + n) mhpmcountern</code>: read-only zero (<code>n</code> ranges from 3 to 32)</p>
+</li>
+<li>
+<p><code>(0xb80 + n) mhpmcounternh</code>: read-only zero (<code>n</code> ranges from 3 to 32)</p>
+</li>
+<li>
+<p><code>(0x320 + n) mhpmevent</code>: read-only zero (<code>n</code> ranges from 3 to 32)</p>
+</li>
+<li>
+<p><code>(0xc00 + n) hpmcountern</code>:  read-only zero (<code>n</code> ranges from 3 to 32)</p>
+</li>
+<li>
+<p><code>(0xc80 + n) hpmcounternh</code>: read-only zero (<code>n</code> ranges from 3 to 32)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_traps"><a class="anchor" href="#_traps"></a>Traps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The standard privileged architecture requires support for exceptions and interrupts.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>At the start of each instruction cycle, a trap is triggered transferring control to an interrupt vector, if both (<code>v2_s3.1.9</code>):</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Interrupts are globally enabled (<code>MIE</code> bit set in <code>mstatus</code>)</p>
+</li>
+<li>
+<p>An interrupt enable bit (<code>mie</code>) and corresponding interrupt pending bit (<code>mip</code>) are both set</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>While an instruction is in execution, if it raises an exception, a trap is triggered transferring control to the exception vector.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The process of triggering a trap takes one cycle, and is the same for both an exception and an interrupt:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <code>mepc</code> CSR is set to the current program counter (instruction interrupted or raising the exception) (<code>v2_s3.1.14</code>)</p>
+</li>
+<li>
+<p>The program counter is set to a trap vector. For exceptions, this is the <code>base</code> address in <code>mtvec</code> (<code>v2_s3.1.7</code>). For interrupts, it is <code>base + 4*cause</code>, where <code>cause</code> is from the exception code column in <code>v2_t3.6</code>. (This design uses vectored interrupts.)</p>
+</li>
+<li>
+<p>The <code>mcause</code> CSR is set to the exception code in <code>v2_t3.6</code>. The interrupt bit is set for an interrupt (<code>v2_s3.1.15</code>).</p>
+</li>
+<li>
+<p>The <code>MIE</code> bit in <code>mstatus</code> is copied to <code>MPIE</code>, and the <code>MIE</code> bit is set to 0 (<code>v2_s3.1.6.1</code>)</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_interrupts"><a class="anchor" href="#_interrupts"></a>Interrupts</h3>
+<div class="paragraph">
+<p>The basic interrupt mechanism follows the Core Local Interruptor (CLINT) specification, based on SiFive chips. The CLINT memory map begins at address <code>0x1000_0000</code>. The meaning of the memory-mapped I/O registers in this region are as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>msip</code>: write 1 to this bit to request a software interrupt, and write 0 to clear it. The value of this bit is reflected in the read-only <code>MSIP</code> field of the <code>mip</code> CSR. The register is initialised to zero.</p>
+</li>
+<li>
+<p><code>mtimecmp</code>: this is the 64-bit timer compare register as described in the RISC-V privileged ISA specification. A timer interrupt becomes pending exactly when <code>mtime &gt;= mtimecmp</code>. It is initialised to zero.</p>
+</li>
+<li>
+<p><code>mtime</code>: this is the 64-bit real time register, which increments at a constant rate with wall clock time. It is initialised to zero.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The external interrupt bit <code>meip</code> in <code>mip</code> (the interrupt-pending register) comes directly from an external interrupt controller which follows the PLIC specification (<code>plic_f1</code>). There is only a single hart in this system, which only implements M-mode, therefore there is only one signal line from the PLIC to the hart (the M-mode external interrupt signal; see <code>plic_s1.3</code>).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_exceptions"><a class="anchor" href="#_exceptions"></a>Exceptions</h3>
+<div class="paragraph">
+<p>When an instruction is executed, it may synchronously raise an exception (meaning the exception is associated with the instruction being executed, and raising the exception will deterministically trigger a trap on the next instruction). The following subset of exceptions defined in <code>v2_t3.6</code> is implemented in the design:</p>
+</div>
+<table id="exceptions" class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. Supported exceptions</caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Exception code</th>
+<th class="tableblock halign-left valign-top">Exception</th>
+<th class="tableblock halign-left valign-top">Caused by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instruction address misaligned</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Program counter not four-byte-aligned on an unconditional jump or branch taken (<code>v2_s2.2</code>). Exception is raised on the jump/branch instruction itself.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instruction access fault</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Program counter does not fall within the instruction memory address region. Exception raised on the instruction with invalid program counter.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Illegal instruction</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The fetched instruction is not supported by this implementation (i.e. is not RV32I, Zicsr, <code>mret</code> or <code>wfi</code>).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Breakpoint</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The <code>ebreak</code> instruction was executed</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Load access fault</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">a load instruction was executed with an address which is not in main memory or an I/O region</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Store access fault</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">a store instruction was executed with an address which is not in main memory or an I/O region, or the address is read-only</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">11</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(M-mode) Environment call</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The <code>ecall</code> instruction was executed</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>In this implementation, load/store instructions do not have alignment requirements, so the load/store address misaligned exceptions are not required.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_memory_map"><a class="anchor" href="#_memory_map"></a>Memory Map</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The memory map for the physical address space is as follows (all addresses are in hexadecimal):</p>
+</div>
+<table id="mem-regions" class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. Memory regions</caption>
+<colgroup>
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+<col style="width: 20%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Memory Region</th>
+<th class="tableblock halign-left valign-top">Address range</th>
+<th class="tableblock halign-left valign-top">Size</th>
+<th class="tableblock halign-left valign-top">Physical Memory Attributes</th>
+<th class="tableblock halign-left valign-top">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instruction ROM</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0000_0000 - 1000_0000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1024</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Instruction fetch only</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">I/O</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000_0000 - 2000_0000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Sum of special register sizes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Read/write (load/store)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">See <a href="#special-io-regs">Special registers in I/O memory</a> below</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Main Memory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2000_0000 - 2000_0400</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1024</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Read/write (load/store)</p></td>
+<td class="tableblock halign-left valign-top"></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The addresses in the I/O region are vacant by default (load/store accesses generate an illegal instruction exception). The accessible addresses are given below:</p>
+</div>
+<table id="special-io-regs" class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. Special registers in I/O memory</caption>
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Address</th>
+<th class="tableblock halign-left valign-top">Register name</th>
+<th class="tableblock halign-left valign-top">Register size</th>
+<th class="tableblock halign-left valign-top">Attributes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000_0000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">msip</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Read/write, but only bit 0 is modified</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000_4000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">mtimecmp</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Read/write (<code>v2_s3.2.1</code>)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">1000_bff8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">mtime</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Read/write (<code>v2_s3.2.1</code>)</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Certain addresses in the instruction memory region have the following defined purposes:</p>
+</div>
+<table id="special-instr-vectors" class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 4. Special vectors in instruction memory</caption>
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Start Address</th>
+<th class="tableblock halign-left valign-top">Memory-mapped Register</th>
+<th class="tableblock halign-left valign-top">Size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0000_0000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Reset vector (initial PC)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0000_0004</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NMI vector</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0000_0008</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Exception vector (mtvec)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0000_0014</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Software interrupt vector</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0000_0024</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Timer interrupt vector</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">0000_0034</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External interrupt vector</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_instructions"><a class="anchor" href="#_instructions"></a>Instructions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The required instructions are the 32-bit RV32I base integer ISA, the Zicsr extension for CSR manipulation, and the privileged-architecture instructions <code>mret</code> and <code>wfi</code>. Each category of instructions is defined below.</p>
+</div>
+<div class="paragraph">
+<p>Unless otherwise specified, all programs are assumed to increment the program counter by four bytes.</p>
+</div>
+<div class="paragraph">
+<p>Many instructions involve building an immediate from instruction fields. The clearest diagram of how to build immediates for most instruction formats is <code>v1_f2.4</code>. Most immediates are sign-extended based on bit 31 of the instruction. The CSR instructions are an exception, which use the <code>rs2</code> field as an unsigned immediate (not sign extended). Normally, the (resulting 32-bit) immediate is used as an operand to an addition, or is written directly to a register.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Whenever calculations below involve <code>rs1</code>, <code>rs2</code>, or <code>rd</code>, the calculation involves the value in the indexed register, not the register index itself.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_privileged_instructions"><a class="anchor" href="#_privileged_instructions"></a>Privileged Instructions</h3>
+<div class="paragraph">
+<p>The following instructions are required for code executing in machine mode (the only privilege level in this design) (<code>v2_s3.3</code>): <code>ecall</code>, <code>ebreak</code>, <code>mret</code>, and <code>wfi</code>.</p>
+</div>
+<div class="paragraph">
+<p>The <code>ecall</code> and <code>ebreak</code> instructions are required by the unprivileged specification RV32I (<code>v1_s2.8</code>). Since the unprivileged instructions are also executing in M-mode in this design, these <code>ecall</code> and <code>ebreak</code> instructions do the same thing as the M-mode versions.</p>
+</div>
+<div class="paragraph">
+<p>The instructions <code>ecall</code> and <code>ebreak</code> raise the exceptions shown in <a href="#exceptions">Supported exceptions</a>, and take no further action.</p>
+</div>
+<div class="paragraph">
+<p>The instruction <code>mret</code> is executed by software to return from a trap. It performs the following steps:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Copies the <code>MPIE</code> bit to <code>MIE</code> in <code>mstatus</code></p>
+</li>
+<li>
+<p>Sets the <code>MPIE</code> to 1</p>
+</li>
+<li>
+<p>Sets the program counter to <code>mepc</code> (<code>v2_s3.3.2</code>)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The <code>wfi</code> is implemented as a NOP (<code>v2_s3.3.3</code>)</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_upper_immediate_rv32i"><a class="anchor" href="#_upper_immediate_rv32i"></a>Upper Immediate (RV32I)</h3>
+<div class="paragraph">
+<p>Upper immediate instructions <code>lui</code> and <code>auipc</code> use an immediate <code>imm</code>, where <code>imm[31:12]</code> is stored in the U-type instruction, and <code>imm[11:0]</code> is 0. Then:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>lui</code> stores <code>imm</code> in the register <code>rd</code></p>
+</li>
+<li>
+<p><code>auipc</code> stores <code>imm + pc</code> in the register <code>rd</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>No exceptions are raised.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_register_register_rv32i"><a class="anchor" href="#_register_register_rv32i"></a>Register-Register (RV32I)</h3>
+<div class="paragraph">
+<p>The instructions <code>add</code>, <code>sub</code>, <code>sll</code>, <code>slt</code> <code>sltu</code>, <code>xor</code>, <code>srl</code>, <code>sra</code>, <code>or</code>, and <code>and</code>, all execute in the same way:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Perform an operation between the two registers <code>rs1</code> and <code>rs2</code></p>
+</li>
+<li>
+<p>Store the result to the register <code>rd</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>No exceptions are raised.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_register_immediate_rv32i"><a class="anchor" href="#_register_immediate_rv32i"></a>Register-Immediate (RV32I)</h3>
+<div class="paragraph">
+<p>The instructions <code>addi</code>, <code>slli</code>, <code>slti</code> <code>sltiu</code>, <code>xori</code>, <code>srli</code>, <code>srai</code>, <code>ori</code>, and <code>andi</code>, all execute in the same way:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Perform an operation between register <code>rs1</code> and the sign-extended immediate <code>{ 20{instr[31]} , instr[31:20] }</code></p>
+</li>
+<li>
+<p>Store the result to the register <code>rd</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>No exceptions are raised.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_unconditional_jump_rv32i"><a class="anchor" href="#_unconditional_jump_rv32i"></a>Unconditional Jump (RV32I)</h3>
+<div class="paragraph">
+<p>The <code>jal</code> and <code>jalr</code> instructions store <code>pc + 4</code> in the register <code>rd</code>, and unconditionally update the program counter. For both instructions, a signed 32-bit immediate <code>imm</code> is encoded in the instruction. (The encoding is different for <code>jal</code> and <code>jalr</code>.) The new program counter is calculated as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>For <code>jal</code>, <code>pc = pc + imm</code></p>
+</li>
+<li>
+<p>For <code>jalr</code>, <code>pc = 0xffff_fffe &amp; (rs1 + imm)</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>If the new <code>pc</code> is not four-byte aligned, an instruction address misaligned exception is raised (and the program counter is not updated).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_conditional_branch_rv32i"><a class="anchor" href="#_conditional_branch_rv32i"></a>Conditional Branch (RV32I)</h3>
+<div class="paragraph">
+<p>The conditional branch instructions <code>beq</code>, <code>bne</code>, <code>blt</code>, <code>bge</code>, <code>bltu</code>, and <code>bgeu</code>, check a condition between registers <code>rs1</code> and <code>rs2</code>, and update the program counter if the condition is satisfied.</p>
+</div>
+<div class="paragraph">
+<p>The new program counter is <code>pc = pc + imm</code>, where <code>imm</code> is a signed 32-bit immediate encoded in the instruction. If the new <code>pc</code> is not four-byte aligned, an instruction misaligned exception is raised (and the program counter is not updated).</p>
+</div>
+<div class="paragraph">
+<p>If the condition is not satisfied, the program counter  is set to <code>pc + 4</code> as normal.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_load_rv32i"><a class="anchor" href="#_load_rv32i"></a>Load (RV32I)</h3>
+<div class="paragraph">
+<p>Load instructions <code>lb</code>, <code>lh</code>, <code>lw</code>, <code>lbu</code>, and <code>lhu</code>, attempt to read a location in memory and write it to <code>rd</code>.</p>
+</div>
+<div class="paragraph">
+<p>The address for the attempted read is <code>rs1 + imm</code>, where <code>imm</code> is a signed 32-bit immediate stored in the instruction.</p>
+</div>
+<div class="paragraph">
+<p>The width of the read is given by the instruction. If the address and width means that a byte falls outside the valid memory region for reading (in main memory or I/O), a load access fault exception is raised, and no registers are modified.</p>
+</div>
+<div class="paragraph">
+<p>If the read is valid, the 1-byte, 2-byte, or 4-byte result is either sign- or zero-extended, and written to <code>rd</code>.</p>
+</div>
+<div class="paragraph">
+<p>The behaviour of exceptions does not depend on whether <code>rd</code> is <code>x0</code> (<code>v1_s2.6</code>).</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+In this design, all alignments are supported (in both loads and stores), and so load/store misalignment exceptions are not raised.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_store_rv32i"><a class="anchor" href="#_store_rv32i"></a>Store (RV32I)</h3>
+<div class="paragraph">
+<p>Store instructions <code>sb</code>, <code>sh</code>, and <code>sw</code>, attempt to write the contents of <code>rs2</code> to a location in memory.</p>
+</div>
+<div class="paragraph">
+<p>The address for the attempted write is <code>rs1 + imm</code>, where <code>imm</code> is a signed 32-bit immediate stored in the instruction. (The encoding is not the same as for load instructions.)</p>
+</div>
+<div class="paragraph">
+<p>The width of the write is given by the instruction. If the address and width means that a byte falls outside the valid memory region for write (in main memory or I/O), a store access fault exception is raised, and no registers are modified.</p>
+</div>
+<div class="paragraph">
+<p>If the write is valid, the 1-byte, 2-byte, or 4-byte value from the low bits of <code>rs2</code> is written to the address.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_control_and_status_register_zicsr"><a class="anchor" href="#_control_and_status_register_zicsr"></a>Control and Status Register (Zicsr)</h3>
+<div class="paragraph">
+<p>The unprivileged specification (<code>v1_ch9</code>) defines the behaviour of the instructions which manipulate CSRs, in the Zicsr ISA extension. The behaviour of the instructions is as follows:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>csrrw</code>: read the addressed CSR into destination register <code>rd</code>, and then write the source register <code>rs1</code> to the addressed CSR.</p>
+</li>
+<li>
+<p><code>csrrwi</code>: read the addressed CSR into destination register <code>rd</code>, and then zero extend the immediate <code>uimm</code> and write it to the addressed CSR.</p>
+</li>
+<li>
+<p><code>csrrs</code>: read the addressed CSR into destination register <code>rd</code>. Then, only if the source register <code>rs1</code> is not <code>x0</code>, bitwise-OR the current value of the CSR with <code>rs1</code>, and write the result back to the CSR (i.e. set bits in the CSR where there is a 1 in <code>rs1</code>).</p>
+</li>
+<li>
+<p><code>csrrsi</code>: read the addressed CSR into destination register <code>rd</code>. Then, only if the immediate <code>uimm</code> is not <code>0</code>, bitwise-OR the current value of the CSR with <code>uimm</code> (zero-extended to 32 bits), and write the result back to the CSR (i.e. set bits in the CSR where there is a 1 in <code>uimm</code>).</p>
+</li>
+<li>
+<p><code>csrrc</code>: read the addressed CSR into destination register <code>rd</code>. Then, only if the source register <code>rs1</code> is not <code>x0</code>, bitwise-AND the current value of the CSR with !<code>rs1</code>, and write the result back to the CSR (i.e. clear bits in the CSR where there is a 1 in <code>rs1</code>).</p>
+</li>
+<li>
+<p><code>csrrci</code>: read the addressed CSR into destination register <code>rd</code>. Then, only if the immediate <code>uimm</code> is not <code>0</code>, bitwise-AND the current value of the CSR with <code>!uimm</code> (zero-extended to 32 bits <em>after</em> negation), and write the result back to the CSR (i.e. clear bits in the CSR where there is a 1 in <code>uimm</code>).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Any instructions that write to a CSR:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>will raise an illegal instruction exception if the CSR is read-only. In this case, the state of registers will be as if the instruction did not occur.</p>
+</li>
+<li>
+<p>will not change the value of an CSR bits that are read-only in otherwise writable registers</p>
+</li>
+<li>
+<p>for WLRL fields in writable CSRs, any value that is written (even an invalid one) will be written anyway, without any checking in hardware.</p>
+</li>
+<li>
+<p>for WARL fields in writable CSRs, any attempt to write an invalid value will cause no change in the CSR field (the old value will be retained).</p>
+</li>
+<li>
+<p>the write will displace any other automatic modification of the CSR by hardware; for example, writing to <code>instret</code> will stop auto-increment of <code>instret</code> on that instruction (<code>v1_s9.1</code>). This is also interpreted as applying to all counters, including <code>mcycle</code>, etc.)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Instructions that read CSRs read the value of the CSR as it was just prior to instruction execution (e.g. the value of <code>instret</code> is taken before incrementing in due to the read instruction itself).</p>
+</div>
+<div class="paragraph">
+<p>Instructions that attempt to perform an operation on a non-existent CSR raise an illegal instruction exception.</p>
+</div>
+<div class="sect3">
+<h4 id="_notes_on_behaviour"><a class="anchor" href="#_notes_on_behaviour"></a>Notes on behaviour</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>The instructions are defined (<code>v1_s9.1</code>) to atomically read and write CSRs. Since there is only one hart in this design, this required is satisfied by a single read/write operation.</p>
+</li>
+<li>
+<p>The <code>csrrw</code> and <code>csrrwi</code> instructions are defined (<code>v1_t9.1</code>) to omit the CSR read if the destination register <code>rd</code> is <code>x0</code>, and not trigger any side effects that would occur on a read. In this design, no CSR has a side effect that occurs on a read, so for simplicity the <code><strong>rw</strong></code> instructions can perform a read irrespective of <code>rd</code>, and attempt the write to <code>rd</code> (which will have no effect if <code>rd</code> is <code>x0</code>).</p>
+</li>
+<li>
+<p>In this design, all CSRs are 32-bits wide, so there is no need to zero-extend them before writing to registers.</p>
+</li>
+<li>
+<p>In this design, writing invalid values to WLRL fields does not raise an illegal instruction exception (<code>v2_s2.3</code>).</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

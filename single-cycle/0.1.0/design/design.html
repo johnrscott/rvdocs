@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Design :: RISC-V Designs</title>
+    <meta name="generator" content="Antora 3.1.6">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="../../..">RISC-V Designs</a>
+      <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <!--
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+      -->
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="single-cycle" data-version="0.1.0">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
+    <h3 class="title"><a href="../index.html">Single Cycle CPU</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Overview</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../spec/spec.html">Specification</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="design.html">Design</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../notes/notes.html">Notes</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Single Cycle CPU</span>
+    <span class="version">0.1.0</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">Single Cycle CPU</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">0.1.0</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="../index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Single Cycle CPU</a></li>
+    <li><a href="design.html">Design</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Design</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>This section contains the design of the data path, the control unit, and other elements of the CPU.</p>
+</div>
+<div class="paragraph">
+<p>The intention is to create a simple single-cycle design that conforms to the specification outlined above. References for the design include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>"2018 Patterson and Hennessy - Computer organisation and design: the hardware software interface (RISC-V edition)", which provides an introduction to single-cycle RISC-V CPU design in chapter 4</p>
+</li>
+<li>
+<p>"2015 Li - Computer principles and design in verilog HDL", which provides a survey of practical techniques for programming general RISC CPUs in Verilog.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The design is intended for synthesis on Xilinx FPGAs. As a result, some design decisions are motivated by guidance in, e.g., <a href="https://docs.xilinx.com/r/en-US/ug949-vivado-design-methodology:"">Xilinx ultrafast design methodology</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_design_summary"><a class="anchor" href="#_design_summary"></a>Design Summary</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The two main components of this single-cycle design are the data path and the control path:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The data path is responsible for the bulk of the calculations in each instruction cycle, and also stores the state of the processor (all the registers and memory). The data path is a sequential module, with all registers and memory updated on the rising clock edge. The data path will support all the RV32I and Zicsr instructions outlined in the specification, and has its behaviour controlled by a set of inputs from the control unit. It has the following interface:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Inputs: clock, control lines from the control unit (including exception information)</p>
+</li>
+<li>
+<p>Outputs: fetched instruction, flags for when an instruction raises an exception</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>The control unit is a purely combinational module which takes a fetched instruction and decodes it into control lines for the data path. In addition, it reads any exception flags raised by the data path and modifies the control lines to trap the exception if necessary. It has the following interface:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Inputs: fetched instruction from the data path, exception flags from the data path</p>
+</li>
+<li>
+<p>Outputs: the control lines for the data path.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In the normal execution of an instruction which does not raise an exception and is not interrupted, the order of operations is as follows:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The data path combinationally fetches an instruction (based on the program counter which is a register in the data path)</p>
+</li>
+<li>
+<p>The fetched instruction is an input to the control unit, which combinationally decodes the instruction and configures the data path control lines</p>
+</li>
+<li>
+<p>The computations involved in executing the instruction in the data path are all combinational, so the result of the computation stabilises at the write inputs to all the registers and memory</p>
+</li>
+<li>
+<p>On the next rising clock edge, the results of the instruction are loaded into registers and memory in the data path</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>In an instruction that raises an exception, the order of operations is as follows:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The data path combinationally fetches an instruction (based on the program counter which is a register in the data path)</p>
+</li>
+<li>
+<p>The fetched instruction is an input to the control unit, which combinationally decodes the instruction and configures the data path control lines</p>
+</li>
+<li>
+<p>The computations involved in executing the instruction load to an exception flag being raised (an output from the data path)</p>
+</li>
+<li>
+<p>The control unit reads the exception flag, and sets control lines to raise an exception trap. In doing so, none of the control lines that caused the exception to be raised are modified (otherwise the exception flag would not persist; this requirement is due to having an all-combinational computation). However, all lines that involves writes to integer registers, data memory, or CSRs should be de-asserted so that the instruction raising the exception does not complete</p>
+</li>
+<li>
+<p>On the next rising clock edge, the CPU state is modified so as to raise the exception (program counter set to exception vector, CSRs modified, etc.)</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Interrupts are always handled "first", before executing an instruction. An interrupt is handled as follows:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The data path checks interrupt conditions in parallel with fetching the instruction, and sets an interrupt flag (output) if an interrupt is pending</p>
+</li>
+<li>
+<p>The control unit reads the interrupt flag, and sets control lines to raise an interrupt trap, instead of decoding the instruction.</p>
+</li>
+<li>
+<p>On the next rising clock edge, the CPU state is modified so as to raise the interrupt (program counter set to interrupt vector, CSRs modified, etc.)</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_data_path"><a class="anchor" href="#_data_path"></a>Data Path</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_main_alu"><a class="anchor" href="#_main_alu"></a>Main ALU</h3>
+<div class="paragraph">
+<p>The design will use a single ALU, which must support computational instructions, address calculations, and comparisons for branch operations. The structure of the RISC-V instructions means that it is possible to consistently route operands to the same input ports of the ALU. The computations required by the RV32I instructions are given below:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>rs1_data OP rs2_data</code>, for register-register and conditional branch instructions</p>
+</li>
+<li>
+<p><code>rs1_data OP imm</code>, for register-immediate, load/store, and <code>jalr</code> instructions</p>
+</li>
+<li>
+<p><code>pc + imm</code>, for <code>jal</code> and <code>auipc</code></p>
+</li>
+<li>
+<p><code>0 + imm</code>, for <code>lui</code> (could also bypass the ALU)</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The <code>jalr</code> instruction also requires masking the ALU result using <code>0xffff_fffe</code> before writing to <code>rd</code>. This is dealt with outside the ALU module.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The main ALU module will take the 32-bit immediate <code>imm</code> from an external immediate generation module, which is assumed to supply the correct immediate for the instruction type.</p>
+</div>
+<div class="paragraph">
+<p>For Zicsr instructions, the following operands are required:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>rs1_data OR csr_rdata</code> for <code>csrrs</code></p>
+</li>
+<li>
+<p><code>imm OR csr_rdata</code> for <code>csrrsi</code></p>
+</li>
+<li>
+<p><code>!rs1_data AND csr_rdata</code> for <code>csrrc</code></p>
+</li>
+<li>
+<p><code>{ 27{1&#8217;b1}, !imm[4:0] } AND csr_rdata</code> for <code>csrrci</code></p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The bitwise negation of the <code>imm</code> instruction only applies to the bottom 5 bits (<code>uimm</code> in CSR instructions); otherwise, <code>csrrci</code> could inadvertently clear high bits of the CSR (above bit 4).
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In the formulas above, the order of operands represents how they will be mapped to the input ports of the ALU. The following pointers motivate the choice of operand order:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <code>rs1_data</code> field is routed to port 1 of the ALU, and immediates are typically routed to port 2. This implies the ALU shift operation must use the first port for the value to be shifted, and use the second port for the shift amount.</p>
+</li>
+<li>
+<p>For Zicsr instructions, the order of operands was chosen to fix the position of <code>csr_rdata</code>, and keep <code>rs1_data</code> on port 1, at the expense of having an immediate on port 1 (inconsistent with RV32I).</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The ALU module is described below.</p>
+</div>
+<div class="sect3">
+<h4 id="_alu_module"><a class="anchor" href="#_alu_module"></a>ALU Module</h4>
+<div class="paragraph">
+<p>The ALU should be able to perform the following operations on its operands <code>a</code> and <code>b</code>, to produce result <code>r</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>addition: <code>r = a + b</code></p>
+</li>
+<li>
+<p>subtraction: <code>r = a - b</code></p>
+</li>
+<li>
+<p>and: <code>r = a &amp; b</code></p>
+</li>
+<li>
+<p>or: <code>r = a | b</code></p>
+</li>
+<li>
+<p>xor: <code>r = a ^ b</code></p>
+</li>
+<li>
+<p>shift left: <code>r = a &lt;&lt; b</code></p>
+</li>
+<li>
+<p>shift right (logical): <code>r = a &gt;&gt; b</code></p>
+</li>
+<li>
+<p>shift right (arithmetic): <code>r = a &gt;&gt;&gt; b</code></p>
+</li>
+<li>
+<p>set if less than (unsigned): <code>r = a &lt; b (unsigned)? 1 : 0</code></p>
+</li>
+<li>
+<p>set if less than (signed): <code>r = a &lt; b (signed)? 1 : 0</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The only required flag is <code>zero</code>, for use by <code>beq</code> and <code>bne</code> instructions. Other conditional branch instructions can use <code>r[0]</code> with the operation set-if-less-than (signed/unsigned).</p>
+</div>
+<div class="paragraph">
+<p>The signature for the <code>alu</code> module is shown below:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-verilog hljs" data-lang="verilog">/// Arithmetic Control Unit
+///
+/// This is a purely combinational ALU implementation.
+///
+/// The operation depends on the 4-bit alu_op as
+/// follows:
+///
+/// 0_000: r = a + b
+/// 1_000: r = a - b
+/// 0_001: r = a &lt;&lt; b
+/// x_010: r = a &lt; b ? 1 : 0
+/// x_011: r = signed(a) &lt; signed(b) ? 1 : 0
+/// x_100: r = a ^ b
+/// 0_101: r = a &gt;&gt; b
+/// 1_101: r = signed(a) &gt;&gt;&gt; signed(b)
+/// x_110: r = a | b
+/// x_111: r = a &amp; b
+///
+/// The separation in alu_op indicates that the top bit
+/// comes form bit 30 of the instruction, and the bottom
+/// 3 bits come from funct3, in R-type register-register
+/// instructions.
+///
+/// For I-type register-immediate instructions, ensure
+/// that the top bit is 0 for addi, slti, sltiu, xori
+/// ori, and andi. For slli, srli, and srai, set the top
+/// bit to bit 30 of the instruction, and set b to the
+/// shift amount (shamt) field. Set the low three
+/// bits to funct3 in all cases.
+///
+module alu(
+    input [31:0] a, // First 32-bit operand
+    input [31:0] b, // Second 32-bit operand
+    input [3:0] alu_op, // ALU control signals (see comments above)
+    output [31:0] r, // 32-bit result
+    output zero // 1 if r is zero, 0 otherwise
+    );</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_main_alu_wrapper"><a class="anchor" href="#_main_alu_wrapper"></a>Main ALU Wrapper</h4>
+<div class="paragraph">
+<p>A wrapper module is used to encapsulate the main ALU, and ensure inputs are mapped to the correct ports of the ALU consistently with the operation being implemented. The signature of the module is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-verilog hljs" data-lang="verilog">/// Main ALU Wrapper Module
+///
+/// This module routes input operands to the
+/// main ALU depending on the instruction
+/// being executed.
+///
+/// The arguments for the ALU are selected
+/// by arg_sel as follows:
+///
+/// 000: rs1_data OP rs2_data
+/// for register-register and conditional branch instructions
+///
+/// 001: rs1_data OP imm
+/// for register-immediate, load/store, and jalr instructions
+///
+/// 010: pc + imm
+/// for jal and auipc
+///
+/// 011: rs1_data OR csr_rdata
+/// for csrrs
+///
+/// 100: imm OR csr_rdata
+/// for csrrsi
+///
+/// 101: !rs1_data AND csr_rdata
+/// for csrrc
+///
+/// 110: { 27{1'b1}, !imm[4:0] } AND csr_rdata
+/// for csrrci
+///
+/// Whenever OP is used above, alu_op is used to
+/// select the ALU operation following the comments
+/// in the alu module.
+///
+/// Ensure that the imm input is consistent with the
+/// operation being implemented (depending on the
+/// instruction format).
+///
+/// In this design, the lui instruction bypasses the ALU.
+module main_alu_wrapper(
+       input [2:0] arg_sel, // Select the ALU arguments
+       input [3:0] alu_op, // Select the ALU operation (when required)
+       input [31:0] rs1_data, // Value of rs1 register
+       input [31:0] rs2_data, // Value of rs2 register
+       input [31:0] imm, // 32-bit immediate
+       input [31:0] pc, // Current program counter
+       input [31:0] csr_rdata, // Read-data for CSR bus
+       output [31:0] main_alu_result, // ALU output
+       output main_alu_zero // ALU zero flag output
+       );</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_immediate_generation"><a class="anchor" href="#_immediate_generation"></a>Immediate Generation</h3>
+<div class="paragraph">
+<p>All immediates encoded in RISC-V instructions should be extended to 32-bit (mostly sign-extended, but zero-extended for Zicsr instructions. In addition, each instruction in RV32I or Zicsr only uses one immediate per instruction (either <code>imm</code> or <code>uimm</code>), meaning one module can decode this single immediate and expose it as one output <code>imm</code>. The module signature is as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-verilog hljs" data-lang="verilog">/// Extract an immediate encoded in the instruction
+///
+/// Each RV32I or Zicsr instruction contains at most
+/// one immediate, which is extracted and converted to
+/// a 32-bit format by this module. For Zicsr instructions,
+/// the uimm field is also zero-extended to 32 bits, and
+/// output using the same imm output.
+///
+/// The reference for how immediates are decoded is
+/// v1_f2.4. The sel input picks the output as follows:
+///
+/// 000: { 21{instr[31]}, instr[30:20] }, I-type
+/// 001: { 21{instr[31]}, {instr[30:25]}, instr[11:7] }, S-type
+/// 010: { 20{instr[31]}, instr[7], instr[30:25], instr[11:8], 1'b0 }, B-type
+/// 011: { instr[31:12], 12{1'b0} }, U-type
+/// 100: { 12{instr[31]}, instr[19:12], instr[20], instr[30:21], 1'b0 }, J-type
+///
+/// 101: { 27{1'b0}, instr[24:20] }, Zicsr
+///
+module imm_gen(
+       input [2:0] sel, // Set immediate to extract
+       input [31:0] instr, // Current instruction
+       output [31:0] imm // Output 32-bit immediate
+       );</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_register_file"><a class="anchor" href="#_register_file"></a>Register File</h3>
+<div class="paragraph">
+<p>The register file is combinational with respect to reads (<code>rs1</code> determines <code>rs1_data</code>, and <code>rs2</code> determines <code>rs2_data</code>), and sequential for writes (<code>rd_data</code> is written to <code>rd</code> on the rising clock edge if <code>write_en</code> is set). The signature for the data path is as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-verilog hljs" data-lang="verilog">/// 32-bit Register file
+///
+/// There are 32 32-bit registers x0-x31, with x0 hardwired
+/// to zero. This module provides two combinational output
+/// ports, controlled by the two addresses rs1 and src, and
+/// a single registered write (on the rising edge of the clock
+/// when the write enable signal is asserted).
+///
+/// There is no reset; on power-on, the register values are
+/// set to zero.
+///
+module register_file(
+    input clk, // clock
+    input write_en, // write enable for rd
+	input [31:0] rd_data, // data for write
+    input [4:0] rs1, // source register index
+    input [4:0] rs2, // source register index
+    input [4:0] rd, // destination register index for write
+    output [31:0] rs1_data, // read port for rs1
+    output [31:0] rs2_data // read port for rs2
+    );</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The fields <code>rs1</code>, <code>rs2</code>, and <code>rd</code> are routed from fixed locations in <code>instr</code>. The source for <code>rd_data</code> is selected from one of the following options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>main_alu_result</code> for register-register, register-immediate, and <code>auipc</code> instructions</p>
+</li>
+<li>
+<p><code>data_mem_rdata</code> for load instructions</p>
+</li>
+<li>
+<p><code>csr_rdata</code> for Zicsr instructions</p>
+</li>
+<li>
+<p><code>pc_plus_4</code> for unconditional jump instructions</p>
+</li>
+<li>
+<p><code>imm</code> for <code>lui</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To simplify the data path, the register file is wrapped in a module that routes the register indices from the instruction, and selects the source for writing data:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-verilog hljs" data-lang="verilog">/// Write data for rd in register file
+///
+/// The rd_data_sel arguments selects between the inputs:
+///
+/// 000: main_alu_result,
+/// for register-register, register-immediate, and auipc instructions
+///
+/// 001: data_mem_rdata
+/// for load instructions
+///
+/// 010: csr_rdata
+/// for Zicsr instruction
+///
+/// 011: pc_plus_4
+/// for unconditional jump instructions
+///
+/// 100: { instr[31:12], 12{1'b0} } (from instr input)
+/// for lui instruction
+///
+module register_file_wrapper(
+	input clk, // for writing
+	input write_en, // 1 to write data to rd; 0 otherwise
+	input [1:0] rd_data_sel, // pick what to write to rd
+	input [31:0] main_alu_result, // the output from the main ALU
+	input [31:0] data_mem_rdata, // data output from data memory bus
+	input [31:0] csr_rdata, // data output from CSR bus
+	input [31:0] pc_plus_4, // current pc + 4, from pc module
+	input [31:0] instr, // current instruction
+    	output [31:0] rs1_data, // read port for rs1
+    	output [31:0] rs2_data // read port for rs2
+    );</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_data_memory_bus"><a class="anchor" href="#_data_memory_bus"></a>Data Memory Bus</h3>
+<div class="paragraph">
+<p>The design will use a simple bus for accesses to data memory (the target for loads and stores). Using a bus allows separate devices (e.g. main memory, and I/O devices) to be separated into different modules.</p>
+</div>
+<div class="paragraph">
+<p>Instead of using an enable signal to pick which device is active on the bus, each device will determine whether it should handle the read or write, by setting a "claim" signal. The read outputs from all the devices are ORed together, and devices not claiming the signal set their output to zero.</p>
+</div>
+<div class="paragraph">
+<p>The claim signals from all the devices are ORed together. On a read or write, this signal can be used to check that at least one device will handle the request. If no device will handle the request, a load/store access fault can be raised.</p>
+</div>
+<div class="paragraph">
+<p>The (logical) bus interface is as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-verilog hljs" data-lang="verilog">interface data_mem_bus();
+   bit        clk; // writes are performed on the rising clock edge
+   bit [31:0] addr; // the read/write address
+   bit [1:0]  width; // the width of the read/write (byte, halfword, word)
+   bit [31:0] rdata; // read-data returned from device
+   bit [31:0] wdata; // write-data passed to device
+   bit	      write_en; // whether to perform a write (or just a read)
+   bit	      claim; // devices will claim read/write based on address/width
+endinterface</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The OR logic for <code>claim</code> and <code>rdata</code> will be handled using modports, one per device (and one for the host).</p>
+</div>
+<div class="paragraph">
+<p>The devices on the bus are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The main memory module (RAM)</p>
+</li>
+<li>
+<p>Any memory-mapped CSRs (in particular, the timer interrupt controller)</p>
+</li>
+<li>
+<p>Any memory-mapped peripherals</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The data memory bus is only used for loads and stores (instruction fetch does not use this bus in this design).</p>
+</div>
+<div class="paragraph">
+<p>For both load and store instructions, the address is calculated by the ALU, so the <code>addr</code> line is hardwired to the main ALU output. The <code>width</code> field depends on the instruction, and is driven by the control unit. The <code>write_en</code> line is set only for store instructions. The <code>wdata</code> field is hardwired to <code>rs2_data</code>, which is the only source for writes to data memory.</p>
+</div>
+<div class="paragraph">
+<p>The <code>claim</code> output is used by the control unit to potentially raise load/store access faults. The <code>rdata</code> output is hardwired to the register file wrapper, which is the only user of data memory bus data (load instructions).</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_csr_bus"><a class="anchor" href="#_csr_bus"></a>CSR Bus</h3>
+<div class="paragraph">
+<p>The CSR bus is similar to the data memory bus:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-verilog hljs" data-lang="verilog">interface csr_bus();
+   bit        clk; // writes are performed on the rising clock edge
+   bit [11:0] addr; // the read/write address
+   bit [31:0] rdata; // read-data returned from a CSR device
+   bit [31:0] wdata; // data to be written to a CSR device
+   bit	      write_en; // whether to perform a write (or just a read)
+   bit	      claim; // devices will claim read/write based on address
+endinterface</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Exactly one CSR device attached to the bus will be responsible for asserting the claim signal, and either writing data or returning data. The other devices return zero on the <code>rdata</code> line. All the <code>rdata</code> lines for each device are ORed together to generate the bus <code>rdata</code> signal (and the same for the bus <code>claim</code> signal).</p>
+</div>
+<div class="paragraph">
+<p>Only Zicsr instructions interact with the CSR bus. The <code>addr</code> input always comes from a fixed position in the instruction, and is hardwired there. The <code>write_en</code> input is set by the control unit. The data written back to the CSR comes from either <code>rs1_data</code>, the main ALU output, or the <code>uimm</code> field of the instruction (via the immediate generation module). The module selecting the resulting value for <code>wdata</code> is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-verilog hljs" data-lang="verilog">/// CSR write data source selection
+///
+/// Depending on the value of sel, the CSR write data
+/// source is chosen as follows:
+///
+/// 00: rs1_data, for csrrw
+/// 01: main_alu_result, for csrrs, csrrc, csrrsi, csrrci
+/// 10: { imm }, for csrrwi
+///
+module csr_wdata_sel(
+       input sel,
+       input [31:0] rs1_data, // from the register file
+       input [31:0] main_alu_result, // from the main ALU
+       input [31:0] imm, // uimm, from immediate generator
+       output [31:0] csr_wdata // to the CSR bus
+       );</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output <code>rdata</code> from the CSR bus is routed to the register file wrapper (<code>csr_rdata</code>), for writing to <code>rd</code>, and is also routed to main ALU wrapper for use in computations that write back to the CSR. The <code>csr_claim</code> signal is returned to the control unit, to check for illegal instruction (on missing CSR).</p>
+</div>
+</div>
+</div>
+</div>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
