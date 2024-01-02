@@ -1,29 +1,45 @@
 site:
-  title: RISC-V Designs
-  start_page: single-cycle::index.adoc
+  title: Antora Demo Site
+  # the 404 page and sitemap files only get generated when the url property is set
+  url: https://antora.gitlab.io/demo/docs-site
+  start_page: component-b::index.adoc
 content:
-  edit_url: false
-  sources: 
-  - url: https://github.com/johnrscott/rv0.git
+  sources:
+  - url: https://gitlab.com/antora/demo/demo-component-a.git
     branches: HEAD
+    # setting edit_url to false disables the Edit this Page link for any page that originates from this repository
+    # the same thing can be achieved by adding empty credentials (i.e., @) in front of the domain in the URL
+    edit_url: false
+  - url: https://gitlab.com/antora/demo/demo-component-b.git
+    branches: [main, v2.0, v1.0]
     start_path: docs
+asciidoc:
+  attributes:
+    experimental: ''
+    idprefix: ''
+    idseparator: '-'
+    page-pagination: ''
 ui:
   bundle:
-    url: https://github.com/johnrscott/rv-antora-ui/releases/download/latest/ui-bundle.zip
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
     snapshot: true
-  # You need this section if you are using GitHub actions to generate
-  # the site, to prevent jekyll from ignoring files starting with _
-  # (see https://docs.antora.org/antora/latest/publish-to-github-pages/).
-  # supplemental_files:
-  # - path: ui.yml
-  #   contents: |
-  #     static_files:
-  #     - .nojekyll
-  # - path: .nojekyll
 
-  #test
+
+# site:
+#   title: RISC-V Designs
+#   start_page: single-cycle::index.adoc
+# content:
+#   edit_url: false
+#   sources: 
+#   - url: https://github.com/johnrscott/rv0.git
+#     branches: HEAD
+#     start_path: docs
+# ui:
+#   bundle:
+#     url: https://github.com/johnrscott/rv-antora-ui/releases/download/latest/ui-bundle.zip
+#     snapshot: true
   
-output:
-  # Go careful not to set dir: to something
-  # that you don't want clean below to delete!
-  clean: true
+# output:
+#   # Go careful not to set dir: to something
+#   # that you don't want clean below to delete!
+#   clean: true
