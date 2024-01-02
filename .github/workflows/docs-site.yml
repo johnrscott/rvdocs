@@ -36,7 +36,7 @@ jobs:
         node-version: '18'
 
     - name: Install Antora
-      run: npm i antora
+      run: npm install antora
 
     - name: Generate Site
       run: npx antora antora-playbook.yml
@@ -45,3 +45,5 @@ jobs:
       uses: actions/upload-pages-artifact@v2
       with:
         path: build/site
+
+    
