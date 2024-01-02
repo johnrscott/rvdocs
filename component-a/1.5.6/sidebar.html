@@ -3,7 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Overview :: RISC-V Designs</title>
+    <title>Sidebar :: Antora Demo Site</title>
+    <link rel="canonical" href="https://antora.gitlab.io/demo/docs-site/component-a/1.5.6/sidebar.html">
+    <link rel="prev" href="admonition.html">
+    <link rel="next" href="ui-macros.html">
     <meta name="generator" content="Antora 3.1.6">
     <link rel="stylesheet" href="../../_/css/site.css">
   </head>
@@ -11,7 +14,7 @@
 <header class="header">
   <nav class="navbar">
     <div class="navbar-brand">
-      <a class="navbar-item" href="../..">RISC-V Designs</a>
+      <a class="navbar-item" href="https://antora.gitlab.io/demo/docs-site">Antora Demo Site</a>
       <button class="navbar-burger" aria-controls="topbar-nav" aria-expanded="false" aria-label="Toggle main menu">
         <span></span>
         <span></span>
@@ -19,7 +22,6 @@
       </button>
     </div>
     <div id="topbar-nav" class="navbar-menu">
-      <!--
       <div class="navbar-end">
         <a class="navbar-item" href="#">Home</a>
         <div class="navbar-item has-dropdown is-hoverable">
@@ -44,44 +46,46 @@
           </span>
         </div>
       </div>
-      -->
     </div>
   </nav>
 </header>
 <div class="body">
-<div class="nav-container" data-component="single-cycle" data-version="0.1.0">
+<div class="nav-container" data-component="component-a" data-version="1.5.6">
   <aside class="nav">
     <div class="panels">
 <div class="nav-panel-menu is-active" data-panel="menu">
   <nav class="nav-menu">
     <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
-    <h3 class="title"><a href="index.html">Single Cycle CPU</a></h3>
+    <h3 class="title"><a href="inline-text-formatting.html">Component A</a></h3>
 <ul class="nav-list">
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="inline-text-formatting.html">Inline Text Formatting</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="special-characters.html">Special Characters and Symbols</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="admonition.html">Admonition</a>
+  </li>
   <li class="nav-item is-current-page" data-depth="1">
-    <a class="nav-link" href="index.html">Overview</a>
+    <a class="nav-link" href="sidebar.html">Sidebar</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="ui-macros.html">User Interface Macros</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Lists</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="lists/ordered-list.html">Ordered Lists</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="lists/unordered-list.html">Unordered Lists</a>
   </li>
 </ul>
-  </li>
-  <li class="nav-item" data-depth="0">
-<ul class="nav-list">
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="spec/spec.html">Specification</a>
-  </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="0">
-<ul class="nav-list">
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="design/design.html">Design</a>
-  </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="0">
-<ul class="nav-list">
-  <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="notes/notes.html">Notes</a>
   </li>
 </ul>
   </li>
@@ -90,15 +94,29 @@
 </div>
 <div class="nav-panel-explore" data-panel="explore">
   <div class="context">
-    <span class="title">Single Cycle CPU</span>
-    <span class="version">0.1.0</span>
+    <span class="title">Component A</span>
+    <span class="version">1.5.6</span>
   </div>
   <ul class="components">
     <li class="component is-current">
-      <a class="title" href="index.html">Single Cycle CPU</a>
+      <a class="title" href="inline-text-formatting.html">Component A</a>
       <ul class="versions">
         <li class="version is-current is-latest">
-          <a href="index.html">0.1.0</a>
+          <a href="inline-text-formatting.html">1.5.6</a>
+        </li>
+      </ul>
+    </li>
+    <li class="component">
+      <a class="title" href="../../component-b/2.0/index.html">Component B</a>
+      <ul class="versions">
+        <li class="version">
+          <a href="../../component-b/2.5/index.html">2.5-beta.1</a>
+        </li>
+        <li class="version is-latest">
+          <a href="../../component-b/2.0/index.html">2.0</a>
+        </li>
+        <li class="version">
+          <a href="../../component-b/1.0/index.html">1.0</a>
         </li>
       </ul>
     </li>
@@ -110,11 +128,11 @@
 <main class="article">
 <div class="toolbar" role="navigation">
 <button class="nav-toggle"></button>
-  <a href="index.html" class="home-link is-current"></a>
+  <a href="../../component-b/2.0/index.html" class="home-link"></a>
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
-    <li><a href="index.html">Single Cycle CPU</a></li>
-    <li><a href="index.html">Overview</a></li>
+    <li><a href="inline-text-formatting.html">Component A</a></li>
+    <li><a href="sidebar.html">Sidebar</a></li>
   </ul>
 </nav>
 </div>
@@ -123,36 +141,36 @@
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Overview</h1>
-<div id="preamble">
+<h1 class="page">Sidebar</h1>
+<div class="sect1">
+<h2 id="sidebar-block"><a class="anchor" href="#sidebar-block"></a>Sidebar block</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This document describes the design of a single-cycle single-hart rv32i_zicsr RISC-V core. The intention is to create a simple implementation of a minimal 32-bit RISC-V standard-compliant CPU.</p>
+<p>A sidebar can be titled and contain any type of content such as source code and images.</p>
 </div>
+<div class="listingblock">
+<div class="title">Sidebar</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-asciidoc hljs" data-lang="asciidoc">.Optional title of sidebar
+****
+Sidebars are used to visually separate short, auxiliary bits of content that supplement the main text.
+****</code></pre>
+</div>
+</div>
+<div class="sidebarblock">
+<div class="content">
+<div class="title">Optional title of sidebar</div>
 <div class="paragraph">
-<p>The two required components in a RISC-V processor are:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>The rv32i base integer instruction set</p>
-</li>
-<li>
-<p>A minimal privileged architecture</p>
-</li>
-</ol>
-</div>
-<div class="paragraph">
-<p>The unprivileged RISC-V specification does not require a particular privileged architecture. However, it does require an execution environment interface which supports certain features, including interrupt and exception handling. The simplest way to support these requirements is to implement the minimal subset of the standard RISC-V privileged architecture, which provides only one privilege level (machine mode), and only implements required control and status registers.</p>
-</div>
-<div class="paragraph">
-<p>The Zicsr extension (control and status register instructions) is not required by the unprivileged architecture. However, since a CPU lacking these instructions would not be able to manage interrupts and exceptions, the Zicsr extension is implemented in this design.</p>
-</div>
-<div class="paragraph">
-<p>The design is intended for synthesis in an FPGA target, and should be complete enough to run software compiled by a standard gcc toolchain, interact with a simple debugging environment (e.g. provide a stdout over UART), and interact with basic peripherals (e.g. GPIO).</p>
+<p>Sidebars are used to visually separate short, auxiliary bits of content that supplement the main text.</p>
 </div>
 </div>
 </div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="admonition.html">Admonition</a></span>
+  <span class="next"><a href="ui-macros.html">User Interface Macros</a></span>
+</nav>
 </article>
   </div>
 </main>
