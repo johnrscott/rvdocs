@@ -41,9 +41,11 @@ jobs:
     - name: Generate Site
       run: npx antora antora-playbook.yml
 
-    - name: Upload Artefacts
-      uses: actions/upload-pages-artifact@v2
+    # This action is good because it adds a .nojekyll
+    # by default, and files in the deployment branch
+    # are cleaned by default.
+    - name: Deploy Github Pages
+      uses: peaceiris/actions-gh-pages@v3
       with:
-        path: build/site
-
-    
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: build/site
